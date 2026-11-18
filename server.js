@@ -42,6 +42,31 @@ app.post("/cursos", (req, res) => {
     }
 });
 
+app.put("/cursos/:id", (req, res) => {
+    const id = Number(req.params.id);
+    const index = cursos.findIndex(c => c.id === id);
+
+    if (index === -1) {
+        return res.status(404).json({ error: "Curso não encontrado para atualização" });
+    }
+
+    try {
+        const dadosAtualizados = new CursoRequestDTO(req.body);
+
+        dadosAtualizados.id = id;
+        cursos[index] = dadosAtualizados;
+        res.json(dadosAtualizados);
+        
+    } catch (error) {
+        if (error.listaErros) {
+            return res.status(400).json({ erros: error.listaErros });
+        }
+        
+        console.error(error);
+        return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+});
+
 
 const PORT = 3001;
 app.listen(PORT, () => {
